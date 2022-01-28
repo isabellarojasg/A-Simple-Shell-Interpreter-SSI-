@@ -36,9 +36,6 @@ char * host_name(){
 	char *user_name;
 	user_name = getlogin();
 	gethostname(host_name, 1024);
-	//printf("%s@%s> \n",user_name,host_name);
-
-	//char* prompt;
 
 	int size_of_host = 0;
 
