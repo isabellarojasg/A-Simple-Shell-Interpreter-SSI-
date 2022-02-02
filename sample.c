@@ -13,12 +13,13 @@ int main(){
 	char * prompt= host_name();
 
 
-	int bailout = 0;
-	while (!bailout) {
+	//int bailout = 0;
+	//while (!bailout) {
 
-	/*
+
 		char line[1024];
 		char* args[1024];
+		printf("%s", prompt);
 		fgets(line,1024,stdin);
 		
 		args[0]=strtok(line," \n");//split string by space or '\n' (IMPORTANT) there will be error without '\n'
@@ -33,20 +34,20 @@ int main(){
     	for(int j=0; j<i; j++){
         	printf("Output 2: %s \n",args[j]);
 		}
-		*/
+
 		
 
-		char* reply = readline(prompt);
+		//char* reply = readline(prompt);
 		
-		if (!strcmp(reply, "bye")) {
-			bailout = 1;
-		} else {
-			printf("\nYou said: %s\n\n", reply);
-		}
+		//if (!strcmp(reply, "bye")) {
+		//	bailout = 1;
+		//} else {
+		//	printf("\nYou said: %s\n\n", reply);
+	//	}
 	
-		free(reply);
+	//	free(reply);
 		
-	}
+	//}
 	printf("Bye Bye\n");
 	free(prompt);
 }
