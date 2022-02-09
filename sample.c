@@ -6,15 +6,16 @@
 #include <unistd.h>
 #include <limits.h>
 char * host_name();
-//char* prompt;
+void add_path();
 
 int main(){
 
 	char * prompt= host_name();
+	
+	int bailout = 0;
+	while (!bailout) {
 
-
-	//int bailout = 0;
-	//while (!bailout) {
+		add_path(prompt);
 
 
 		char line[1024];
@@ -24,7 +25,7 @@ int main(){
 		
 		args[0]=strtok(line," \n");//split string by space or '\n' (IMPORTANT) there will be error without '\n'
     	
-		printf("Output 1: %s, %s \n",args[0],args[1]);
+		//printf("Output 1: %s, %s \n",args[0],args[1]);
     	
 		int i=0;
     	while(args[i]!=NULL){//make sure that args has a NULL pointer at the end
@@ -32,8 +33,30 @@ int main(){
         	i++;
         }
     	for(int j=0; j<i; j++){
-        	printf("Output 2: %s \n",args[j]);
+        	//printf("Output 2: %s \n",args[j]);
 		}
+
+		Pid_t pid;
+		pid = fork();
+
+		if (pid < 0){
+			fprintf(stderr, "Fork Failed");
+		}
+		if(p==0){
+			execvp(argv[0],argv);
+			printf("ERROR\n");
+		}
+
+
+
+
+
+
+
+
+
+
+
 
 		
 
@@ -46,10 +69,38 @@ int main(){
 	//	}
 	
 	//	free(reply);
-		
-	//}
+		//free(prompt);
+	}
 	printf("Bye Bye\n");
 	free(prompt);
+
+}
+
+void add_path(char * prompt){
+
+	char path[1024];
+	if(getcwd(path, sizeof(path)) != NULL){
+		//printf("directory %s", path);
+	} else{
+		printf("error");
+	}
+
+	char* x;
+	for (x = prompt; *x != ':'; x++){
+		//printf("%c" , *x);
+	}
+	*x = ':'; x++;
+	*x = ' '; x++;
+
+
+	char *p;
+	for (p = path; *p != '\0'; p ++, x++){
+		*x= *p;
+	}
+	*x = '>'; x++;
+	*x = ' '; x++;
+	*x = '\0';
+
 }
 
 char * host_name(){
@@ -81,7 +132,7 @@ char * host_name(){
 	for (t = host; *t != '\0'; t++, x++){
 		*x = *t;
 	}
-	*x= '>'; x++;
+	*x= ':'; x++;
 	*x= ' '; x++;
 	*x = '\0';
 
