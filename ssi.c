@@ -22,34 +22,29 @@ bg_pro *root;
 int main(){
 
 	char * prompt= host_name();
-
 	
 	int bailout = 0;
+	
 	while (!bailout) {
 
 		add_path(prompt);
-
-		
-		char line[1024];
-		char* args[1024];
-		printf("%s", prompt);
+		char line[1024];	
+		char* args[1024];	
+		printf("%s", prompt);	
 		fgets(line,1024,stdin);
-			
-		
 		args[0]=strtok(line," \n");
-    	
-    	
+
 		int i=0;
-    	while(args[i]!=NULL){
-       		args[i+1]=strtok(NULL," \n");
+		while(args[i]!=NULL){
+		   	args[i+1]=strtok(NULL," \n");
         	i++;
         }
 
 		if(root != NULL){
-
 			pid_t ter = waitpid(0,NULL,WNOHANG);
 			
 			if (ter > 0){
+
 				if (root->pid ==ter){
 					printf("%i: ",root->pid);
 					
@@ -58,105 +53,75 @@ int main(){
 						printf("%c",root->command[w]);
 						w++;
 					}
-					
 					printf(" has terminated.\n");
-					
-					
 					root = root->next;
 				}
+			
 			}else{
 				bg_pro *cur;
-
-
-				for (cur = root;cur->next != NULL; cur->next){
+				for (cur = root;cur->next != NULL;cur->next){
 					cur = cur->next;
 				}
-				
-					printf("%i: ",cur->pid);
-					
-					int w=0;
-					while(cur->command[w]!= '\0'){
-						printf("%c",cur->command[w]);
-						w++;
-					}
-					
-					printf(" has terminated\n");
+				printf("%i: ",cur->pid);	
+				int w=0;
+				while(cur->command[w]!= '\0'){
+					printf("%c",cur->command[w]);
+					w++;
+				}	
+				printf(" has terminated\n");
 				cur = cur->next;
-
-
 			}
-
-
 		}
 	
-		
-		
-		
 		if (!strcmp(args[0], "exit")){
-			bailout = 1;
+			break;
 		} else if (!strcmp(args[0], "cd")){
 			change_directory(args);
 		}else if (!strcmp(args[0], "bg")){
-
-
 			backgroud_prc(args);
-			
-			
 		}else if (!strcmp(args[0], "bglist")){
 			bg_pro * hi;
 			int i = 1;
+			
 			for (hi = root; hi->next != NULL; hi = hi->next, i++){
-				//printf("%i : %c %i\n",hi->pid,hi->command[0],i);
 				printf("%i : ",hi->pid);
-
+				
 				int w=0;
 				while(hi->command[w]!= '\0'){
 					printf("%c",hi->command[w]);
 					w++;
 				}
-
 				printf(" %i\n",i);
-
 			}
 
 			printf("%i : ",hi->pid);
 
-				int w=0;
-				while(hi->command[w]!= '\0'){
-					printf("%c",hi->command[w]);
-					w++;
-				}
+			int w=0;
+			while(hi->command[w]!= '\0'){
+				printf("%c",hi->command[w]);
+				w++;
+			}
+			printf(" %i\n",i);
 
-				printf(" %i\n",i);
-
-		printf("Total Backgrounf jobs: %i\n\n",i);
-
-
-		
+			printf("Total Background jobs: %i\n\n",i);
 		}else{
 			execute_commands(args);
 		}
-
-
-	
 	}
 	printf("Bye Bye\n");
 	free(prompt);
-	}
+}
 
+/*
 
+ This function executed all the background processes.
+ It is executed when the input starts with "bg".
 
+*/
 void backgroud_prc(char* args[1024]){
 
 
 	char* new_args[1024];
-	
-	int size = 0;
-	int i = 0;
-	while (args[i] != NULL ){
-		size +=1;
-		i ++;
-	}
 
 	int j=1;
 	int p=0;
@@ -191,62 +156,43 @@ void backgroud_prc(char* args[1024]){
 			for (w = 0; new_args[w] != NULL; w++){
 				for (g=0;new_args[w][g]!= '\0'; g++){
 						temp->command[h] = new_args[w][g];
-				
 					h++;
 				}
-
 			}
 			temp->command[h] = '\0';
-			
 			temp->pid = pidd;
-
-
 			root = temp;
-
-
 		}else{
-
-
 			waitpid(pidd, NULL, 0);
 			
 			bg_pro *temp = (bg_pro *)malloc(sizeof(bg_pro));
-
-				int w=0;
+			int w=0;
 			int g=0;
 			int h=0;
 			for (w = 0; new_args[w] != NULL; w++){
 				for (g=0;new_args[w][g]!= '\0'; g++){
 					temp->command[h] = new_args[w][g];
-
 					h++;
 				}
 			}
-
 			temp->command[h] = '\0';
-			
-					
 			temp->pid = pidd;
 
 			bg_pro *curent;
-
 			for (curent = root;curent->next != NULL; curent->next){
-			//	printf("THIS SHOULD APPEAR ONCE\n");
-
 				curent = curent->next;
 			}
-			//printf("this %c \n", root->command[0]);
-
-			
 			curent->next = temp;
-
-
 		}
 	}
-
-		
-
 }
 
+/*
+
+ This function executes the directory change commands.
+ It is executed when the input starts with "cd".
+
+*/
 void change_directory(char* args[1024]){
 
 	int size = 0;
@@ -279,6 +225,12 @@ void change_directory(char* args[1024]){
 
 }
 
+
+/*
+
+ This function executes commands.
+
+*/
 void execute_commands(char* args[1024]){
 		
 		pid_t pid;
@@ -289,13 +241,20 @@ void execute_commands(char* args[1024]){
 			exit(-1);
 		} else if (pid==0){
 			execvp(args[0],args);
-			printf("ERROR\n");
+			printf("ERROR: NOT VALID COMMAND\n");
 		}else {
 			wait(NULL);
 		}
 
 }
 
+/*
+
+ This function adds the path to the prompt 
+ and updates it if there was a command that
+ changed directories.
+
+*/
 void add_path(char * prompt){
 
 	char path[1024];
@@ -323,6 +282,11 @@ void add_path(char * prompt){
 
 }
 
+/*
+
+ This function adds the host name to the prompt.
+
+*/
 char * host_name(){
 
 	char host_name[1024];
